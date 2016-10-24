@@ -59,12 +59,12 @@ cdef class PyVBFreader:
     cdef loadSamples(self):
          numSamples = self.c_event.getNumSamples()
          numChannels = self.c_event.getNumChannels()
-         self.samples = <np.int8_t[:numChannels, :numSamples]> self.c_event.getSamplePtr(0,0) 
+         self.samples = <np.uint8_t[:numChannels, :numSamples]> self.c_event.getSamplePtr(0,0) 
 
     cpdef getSamples(self,int i):
          self.loadEvent(i)
          if (self.c_event == NULL):
-            return np.ones((500,20),dtype='int8')*-1
+            return np.ones((500,20),dtype='uint8')*-1
          self.loadSamples()
          numpy_array = np.asarray(self.samples)
          return numpy_array 

@@ -5,9 +5,14 @@ from cython cimport view
 cimport numpy as np
 
 cdef extern from "Words.h":
-    ctypedef np.int32_t uword32
-    ctypedef np.int16_t uword16
-    ctypedef np.int8_t ubyte
+    ctypedef np.int8_t      byte
+    ctypedef np.int16_t   word16
+    ctypedef np.int32_t   word32
+    ctypedef np.int64_t   word64
+    ctypedef np.uint8_t    ubyte
+    ctypedef np.uint16_t uword16
+    ctypedef np.uint32_t uword32
+    ctypedef np.uint64_t uword64
 
 cdef extern from "VSimulationHeader.h":
     cdef cppclass VSimulationHeader:
