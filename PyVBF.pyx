@@ -13,7 +13,7 @@ cdef class PyVBFreader:
     cdef VArrayEvent*       c_arrayevent
     cdef VEvent*            c_event
     cdef bool             is_loaded
-    cdef uword32          packet_type
+    cdef np.int8_t        packet_type
     cdef view.array       samples 
    
     def __cinit__(self,str fname,bool map_index=True,bool read_only=True):
@@ -23,19 +23,24 @@ cdef class PyVBFreader:
         self.is_loaded = False
         self.read_packet()
 
+    # Check Packet Type
     cdef __check_packet_type__(self):
+
          if(self.c_packet.hasSimulationHeader()):
              self.packet_type = 0     
-         if(self.c_packet.hasArrayEvent()):
+         elif(self.c_packet.hasArrayEvent()):
              self.packet_type = 1     
-         if(self.c_packet.hasSimulationData()):
+         elif(self.c_packet.hasSimulationData()):
              self.packet_type = 2
-         if(self.c_packet.hasCorsikaSimulationData()):
+         elif(self.c_packet.hasCorsikaSimulationData()):
              self.packet_type = 3
+         else:
+             self.packet_type =-1
 
     def get_packet_type(self):
          return self.packet_type
 
+    # Packet Loading
     cpdef go_to_packet(self,int i):
         del  self.c_packet 
         self.c_packet = self.c_reader.readPacket(i)
@@ -44,13 +49,9 @@ cdef class PyVBFreader:
  
     cdef read_packet(self):
         if(self.packet_type == 0): 
-           try:
-              self.c_simheader = self.c_packet.getSimulationHeader()
-           except:
-              pass #Temp solution 
-        if(self.packet_type == 1):
+            self.c_simheader = self.c_packet.getSimulationHeader()
+        elif(self.packet_type == 1):
             self.c_arrayevent = self.c_packet.getArrayEvent() 
-
         self.is_loaded = True
 
     cdef loadEvent(self,int i):
