@@ -24,7 +24,13 @@ cdef extern from "VSimulationHeader.h":
          uword32 fDateOfSimsUTC
 
 cdef extern from "VDatum.h":
-    cdef cppclass VEvent:
+    cdef cppclass VDatum:
+         VDatum()
+         ubyte getGPSYear()
+         uword16* getGPSTime()
+         ubyte    getRawEventTypeCode()
+
+    cdef cppclass VEvent(VDatum):
          uword16 getNumSamples()    
          uword16 getNumChannels()    
          uword16 getMaxNumChannels()    

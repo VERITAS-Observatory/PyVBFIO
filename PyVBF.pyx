@@ -9,10 +9,44 @@ import numpy as np
 
 cdef struct Event:
     VEvent* c_event
+    int     GPSTimeLen
     int     numSamples
     int     numChannels
     ubyte*  samplesPtr
+    uword16*  GPSTime
+    ubyte   EventTypeCode
+    ubyte   GPSYear
+    int     fGPSStatus
+    int     fGPSDays 
+    int     fGPSHrs
+    int     fGPSMins
+    double  fGPSSecs
     
+    
+cdef void decodeGPS(Event* evt,uword16* GPSTime):
+    evt.fGPSStatus = (GPSTime[0] >>4 & 0xF)
+    evt.fGPSDays   = ( 100*(GPSTime[0] & 0x000F)     +
+                        10*(GPSTime[1]>>12 & 0x000F) +
+                           (GPSTime[1]>>8  & 0x000F)
+                     )
+
+    evt.fGPSHrs    = ( 10*(GPSTime[1] >>4 & 0x000F) +
+                        (GPSTime[1] >> 0 & 0x000F))
+
+    evt.fGPSMins   = ( 10* (GPSTime[2]>>12 & 0x000F) +
+                       (GPSTime[2]>>8 & 0x000F) )
+
+    evt.fGPSSecs   = ( 10* (GPSTime[2]>>4 & 0x000F)   +
+                       (GPSTime[2]>>0 & 0x000F)
+                     )
+    evt.fGPSSecs += ( 1E-1*(GPSTime[3]>>12 & 0x000F) +
+    1E-2*(GPSTime[3]>>8 & 0x000F)  +
+    1E-3*(GPSTime[3]>>4 & 0x000F)  +
+    1E-4*(GPSTime[3]>>0 & 0x000F)  +
+    1E-5*(GPSTime[4]>>12 & 0x000F) +
+    1E-6*(GPSTime[4]>>8 & 0x000F)  +
+    1E-7*(GPSTime[4]>>4 & 0x000F) )
+
 cdef class PyVBFreader:
     cdef VBankFileReader* c_reader
     cdef VPacket*         c_packet
@@ -70,6 +104,41 @@ cdef class PyVBFreader:
             self.c_evt_struct.numSamples  = self.c_evt_struct.c_event.getNumSamples()
             self.c_evt_struct.numChannels = self.c_evt_struct.c_event.getNumChannels()
             self.c_evt_struct.samplesPtr = self.c_evt_struct.c_event.getSamplePtr(0,0)  
+            self.c_evt_struct.GPSTime    = self.c_evt_struct.c_event.getGPSTime()
+            self.c_evt_struct.EventTypeCode = self.c_evt_struct.c_event.getRawEventTypeCode()
+            self.c_evt_struct.GPSTimeLen    = 5
+            self.c_evt_struct.GPSYear       = self.c_evt_struct.c_event.getGPSYear()
+            decodeGPS(&(self.c_evt_struct),self.c_evt_struct.c_event.getGPSTime())             
+
+    cpdef getGPSYear(self):
+         return self.c_evt_struct.GPSYear
+    
+    cpdef getGPSTimeRaw(self):
+         cdef int length = self.c_evt_struct.GPSTimeLen
+         return np.asarray(<np.uint16_t[:length]> self.c_evt_struct.GPSTime)
+
+    cpdef getGPSStatus(self):
+         return self.c_evt_struct.fGPSStatus
+
+    cpdef getGPSDays(self):
+         return self.c_evt_struct.fGPSDays
+
+    cpdef getGPSHrs(self):
+         return self.c_evt_struct.fGPSHrs
+
+    cpdef getGPSMins(self):
+         return self.c_evt_struct.fGPSMins
+
+    cpdef getGPSSecs(self):
+         return self.c_evt_struct.fGPSSecs
+
+
+
+
+
+
+    cpdef getRawEventType(self):
+         return self.c_evt_struct.EventTypeCode
 
     cpdef getSamples(self):
          if (self.c_evt_struct.c_event == NULL):
