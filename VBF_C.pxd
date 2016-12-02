@@ -36,6 +36,37 @@ cdef extern from "VDatum.h":
          uword16 getMaxNumChannels()    
          ubyte*  getSamplePtr(unsigned channel,unsigned sample) except +
 
+cdef extern from "VSimulationData.h":
+    cdef cppclass VSimulationData:
+         VSimulationData()
+         uword32 fEventNumber
+         float fEnergyGeV
+  
+         float fObservationZenithDeg
+         float fObservationAzimuthDeg
+         
+         float fPrimaryZenithDeg
+         float fPrimaryAzimuthDeg
+       
+         float fRefZenithDeg   
+         float fRefAzimuthDeg  
+         float fRefPositionAngleDeg
+       
+         float fCoreEastM
+         float fCoreSouthM
+         float fCoreElevationMASL
+
+cdef extern from "VCorsikaSimulationData.h":
+    cdef cppclass VCorsikaSimulationData:
+         VCorsikaSimulationData()
+         long fRunNumber
+         uword32 fEventNumber
+         float   fFirstInteractionHeight
+         float   fFirstInteractionDepth
+         word32 fShowerID
+         word32 fCorsikaRunID
+ 
+ 
 cdef extern from "VArrayEvent.h":
     cdef cppclass VArrayEvent:
          VArrayEvent()
@@ -61,5 +92,6 @@ cdef extern from "VBankFileReader.h":
        uword32 numPackets() except +
        VPacket* readPacket(uword32 i) except +
        long getRunNumber()
+
 
 

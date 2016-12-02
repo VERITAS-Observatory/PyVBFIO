@@ -70,10 +70,14 @@ cdef class PyVBFreader:
              self.packet_type = 0     
          elif(self.c_packet.hasArrayEvent()):
              self.packet_type = 1     
+             if(self.c_packet.hasSimulationData()):
+                 self.packet_type = 2
+             if(self.c_packet.hasCorsikaSimulationData()):
+                 self.packet_type = 3
          elif(self.c_packet.hasSimulationData()):
-             self.packet_type = 2
-         elif(self.c_packet.hasCorsikaSimulationData()):
-             self.packet_type = 3
+             self.packet_type = 4
+         elif(self.c_packet.hasSimulationData()):
+             self.packet_type = 5
          else:
              self.packet_type =-1
 
@@ -83,6 +87,7 @@ cdef class PyVBFreader:
     # Packet Loading
     cpdef go_to_packet(self,int i):
         del  self.c_packet 
+        self.c_arrayevent = NULL
         self.c_packet = self.c_reader.readPacket(i)
         self.__check_packet_type__()      
         self.read_packet()
@@ -90,7 +95,9 @@ cdef class PyVBFreader:
     cdef read_packet(self):
         if(self.packet_type == 0): 
             self.c_simheader = self.c_packet.getSimulationHeader()
-        elif(self.packet_type == 1):
+        elif(self.packet_type == 1 or 
+             self.packet_type == 2 or
+             self.packet_type == 3   ):
             self.c_arrayevent = self.c_packet.getArrayEvent() 
         self.is_loaded = True
 
@@ -146,7 +153,7 @@ cdef class PyVBFreader:
          cdef int numChannels = self.c_evt_struct.numChannels  
          cdef int numSamples = self.c_evt_struct.numSamples  
          numpy_array = np.asarray(<np.uint8_t[:numChannels, :numSamples]>self.c_evt_struct.samplesPtr)
-         return numpy_array 
+         return numpy_array.copy() 
  
     def get_sim_header(self):
         return self.c_simheader.fSimConfigFile         
