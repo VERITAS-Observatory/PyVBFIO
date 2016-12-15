@@ -156,6 +156,8 @@ cdef class PyVBFreader:
          return numpy_array.copy() 
  
     def get_sim_header(self):
+        if(self.c_simheader == NULL):
+            raise Exception("No simulation header loaded.")
         return self.c_simheader.fSimConfigFile         
 
     def get_current_packet_size(self):
