@@ -13,13 +13,13 @@ for root, dirs, files in os.walk(".", topdown=False):
     for name in dirs:
         if (name == "build"):
             shutil.rmtree(name)
-# build "myext.so" python extension to be added to "PYTHONPATH" afterwards...
+# build "PyVBF.so" python extension to be added to "PYTHONPATH" afterwards...
 setup(
     cmdclass = {'build_ext': build_ext},
     ext_modules = [
         Extension("PyVBF", 
                   sources=["PyVBF.pyx"],
-                  libraries=["VBF"],          # refers to "libexternlib.so"
+                  libraries=["VBF"],          # refers to "libVBF.so"
                   language="c++",                   # remove this if C and not C++
                   extra_compile_args=["-O3"]
              )
