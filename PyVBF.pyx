@@ -75,9 +75,10 @@ cdef class PyVBFreader:
              if(self.c_packet.hasCorsikaSimulationData()):
                  self.packet_type = 3
          elif(self.c_packet.hasSimulationData()):
-             self.packet_type = 4
-         elif(self.c_packet.hasSimulationData()):
-             self.packet_type = 5
+             if(self.c_packet.hasCorsikaSimulationData()):
+                 self.packet_type = 5
+             else:
+                 self.packet_type = 4
          else:
              self.packet_type =-1
 
