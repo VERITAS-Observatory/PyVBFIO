@@ -57,7 +57,7 @@ cdef class PyVBFreader:
     cdef Event            c_evt_struct
    
     def __cinit__(self,str fname,bool map_index=True,bool read_only=True):
-        self.c_reader = new VBankFileReader(fname,map_index,read_only)
+        self.c_reader = new VBankFileReader(fname.encode(),map_index,read_only)
         self.c_packet = self.c_reader.readPacket(0)
         self.__check_packet_type__()
         self.is_loaded = False
