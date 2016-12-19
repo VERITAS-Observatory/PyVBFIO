@@ -15,6 +15,7 @@ cdef struct Event:
     ubyte*  samplesPtr
     uword16*  GPSTime
     ubyte   EventTypeCode
+    TriggerType trigger 
     ubyte   GPSYear
     int     fGPSStatus
     int     fGPSDays 
@@ -89,6 +90,7 @@ cdef class PyVBFreader:
     cpdef go_to_packet(self,int i):
         del  self.c_packet 
         self.c_arrayevent = NULL
+        self.c_simheader  = NULL
         self.c_packet = self.c_reader.readPacket(i)
         self.__check_packet_type__()      
         self.read_packet()
@@ -114,6 +116,7 @@ cdef class PyVBFreader:
             self.c_evt_struct.samplesPtr = self.c_evt_struct.c_event.getSamplePtr(0,0)  
             self.c_evt_struct.GPSTime    = self.c_evt_struct.c_event.getGPSTime()
             self.c_evt_struct.EventTypeCode = self.c_evt_struct.c_event.getRawEventTypeCode()
+            self.c_evt_struct.trigger = self.c_evt_struct.c_event.getEventType().trigger
             self.c_evt_struct.GPSTimeLen    = 5
             self.c_evt_struct.GPSYear       = self.c_evt_struct.c_event.getGPSYear()
             decodeGPS(&(self.c_evt_struct),self.c_evt_struct.c_event.getGPSTime())             
@@ -152,8 +155,22 @@ cdef class PyVBFreader:
              numpy_array[i] = self.c_evt_struct.c_event.getHiLo(i)
          return numpy_array           
          
-    cpdef getRawEventType(self):
+    cpdef getRawEventTypeCode(self):
          return self.c_evt_struct.EventTypeCode
+
+    cpdef getTriggerType(self):
+         if(self.c_evt_struct.c_event == NULL):
+             return 'NOT_LOADED'
+         if(self.c_evt_struct.trigger == L2_TRIGGER):
+             return 'L2_TRIGGER'
+         if(self.c_evt_struct.trigger == PED_TRIGGER):
+             return 'PED_TRIGGER'
+         if(self.c_evt_struct.trigger == HIGH_MULT_TRIGGER):
+             return 'HIGH_MULT_TRIGGER'
+         if(self.c_evt_struct.trigger == NEW_PHYS_TRIGGER):
+             return 'NEW_PHYS_TRIGGER'
+         if(self.c_evt_struct.trigger == CAL_TRIGGER):
+             return 'CAL_TRIGGER'
 
     cpdef getSamples(self):
          if (self.c_evt_struct.c_event == NULL):

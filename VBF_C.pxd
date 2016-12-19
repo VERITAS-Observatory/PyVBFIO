@@ -23,12 +23,24 @@ cdef extern from "VSimulationHeader.h":
          uword32 fSimulationPackage
          uword32 fDateOfSimsUTC
 
+cdef extern from "VEventType.h":
+    ctypedef enum TriggerType "VEventType::TriggerType":
+             L2_TRIGGER        "VEventType::L2_TRIGGER"
+             HIGH_MULT_TRIGGER "VEventType::HIGH_MULT_TRIGGER"
+             NEW_PHYS_TRIGGER  "VEventType::NEW_PHYS_TRIGGER"
+             CAL_TRIGGER       "VEventType::CAL_TRIGGER"
+             PED_TRIGGER       "VEventType::PED_TRIGGER"
+     
+    cdef struct VEventType:
+         TriggerType trigger
+
 cdef extern from "VDatum.h":
     cdef cppclass VDatum:
          VDatum()
          ubyte getGPSYear()
          uword16* getGPSTime()
          ubyte    getRawEventTypeCode()
+         VEventType getEventType() 
 
     cdef cppclass VEvent(VDatum):
          uword16 getNumSamples()    
