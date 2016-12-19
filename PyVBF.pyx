@@ -142,9 +142,16 @@ cdef class PyVBFreader:
 
 
 
+    cpdef getHiLo(self):
+         if (self.c_evt_struct.c_event == NULL):
+            return np.zeros(500,dtype='bool')
 
-
-
+         cdef int numChannels  = self.c_evt_struct.numChannels
+         numpy_array = np.zeros(numChannels,dtype='bool')
+         for i in range(numChannels):
+             numpy_array[i] = self.c_evt_struct.c_event.getHiLo(i)
+         return numpy_array           
+         
     cpdef getRawEventType(self):
          return self.c_evt_struct.EventTypeCode
 
