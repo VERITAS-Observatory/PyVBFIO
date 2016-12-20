@@ -6,7 +6,6 @@ cimport numpy as np
 from VBF_C cimport *
 import numpy as np
 
-
 cdef struct Event:
     VEvent* c_event
     int     GPSTimeLen
@@ -22,7 +21,6 @@ cdef struct Event:
     int     fGPSHrs
     int     fGPSMins
     double  fGPSSecs
-    
     
 cdef void decodeGPS(Event* evt,uword16* GPSTime):
     evt.fGPSStatus = (GPSTime[0] >>4 & 0xF)
@@ -54,37 +52,26 @@ cdef class PyVBFreader:
     cdef VSimulationHeader* c_simheader
     cdef VArrayEvent*       c_arrayevent
     cdef bool             is_loaded
-    cdef np.int8_t        packet_type
     cdef Event            c_evt_struct
-   
+ 
     def __cinit__(self,str fname,bool map_index=True,bool read_only=True):
         self.c_reader = new VBankFileReader(fname.encode(),map_index,read_only)
         self.c_packet = self.c_reader.readPacket(0)
-        self.__check_packet_type__()
         self.is_loaded = False
         self.read_packet()
 
-    # Check Packet Type
-    cdef __check_packet_type__(self):
+    # Getter function for packet type functions
+    cpdef hasSimulationHeader(self):
+        return self.c_packet.hasSimulationHeader()
 
-         if(self.c_packet.hasSimulationHeader()):
-             self.packet_type = 0     
-         elif(self.c_packet.hasArrayEvent()):
-             self.packet_type = 1     
-             if(self.c_packet.hasSimulationData()):
-                 self.packet_type = 2
-             if(self.c_packet.hasCorsikaSimulationData()):
-                 self.packet_type = 3
-         elif(self.c_packet.hasSimulationData()):
-             if(self.c_packet.hasCorsikaSimulationData()):
-                 self.packet_type = 5
-             else:
-                 self.packet_type = 4
-         else:
-             self.packet_type =-1
+    cpdef hasArrayEvent(self):
+        return self.c_packet.hasArrayEvent()
 
-    def get_packet_type(self):
-         return self.packet_type
+    cpdef hasSimulationData(self):
+        return self.c_packet.hasSimulationData()
+
+    cpdef hasCorsikaSimulationData(self):
+        return self.c_packet.hasCorsikaSimulationData()
 
     # Packet Loading
     cpdef go_to_packet(self,int i):
@@ -92,16 +79,16 @@ cdef class PyVBFreader:
         self.c_arrayevent = NULL
         self.c_simheader  = NULL
         self.c_packet = self.c_reader.readPacket(i)
-        self.__check_packet_type__()      
         self.read_packet()
  
     cdef read_packet(self):
-        if(self.packet_type == 0): 
+        if(self.c_packet.hasSimulationHeader()): 
             self.c_simheader = self.c_packet.getSimulationHeader()
-        elif(self.packet_type == 1 or 
-             self.packet_type == 2 or
-             self.packet_type == 3   ):
+
+        elif(self.c_packet.hasArrayEvent()):
             self.c_arrayevent = self.c_packet.getArrayEvent() 
+        else:
+            self.is_loaded = False
         self.is_loaded = True
 
     cpdef loadEvent(self,int i):
