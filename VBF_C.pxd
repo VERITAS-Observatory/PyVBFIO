@@ -40,8 +40,9 @@ cdef extern from "VDatum.h":
          ubyte getGPSYear()
          uword16* getGPSTime()
          ubyte    getRawEventTypeCode()
+         uword32 getEventNumber()
          VEventType getEventType() 
-
+         
     cdef cppclass VEvent(VDatum):
          uword16 getNumSamples()    
          uword16 getNumChannels()    

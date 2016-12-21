@@ -16,6 +16,7 @@ cdef struct Event:
     ubyte   EventTypeCode
     TriggerType trigger 
     ubyte   GPSYear
+    uword32 eventNumber
     int     fGPSStatus
     int     fGPSDays 
     int     fGPSHrs
@@ -106,6 +107,7 @@ cdef class PyVBFreader:
             self.c_evt_struct.trigger = self.c_evt_struct.c_event.getEventType().trigger
             self.c_evt_struct.GPSTimeLen    = 5
             self.c_evt_struct.GPSYear       = self.c_evt_struct.c_event.getGPSYear()
+            self.c_evt_struct.eventNumber   = self.c_evt_struct.c_event.getEventNumber()
             decodeGPS(&(self.c_evt_struct),self.c_evt_struct.c_event.getGPSTime())             
 
     cpdef getGPSYear(self):
@@ -130,7 +132,8 @@ cdef class PyVBFreader:
     cpdef getGPSSecs(self):
          return self.c_evt_struct.fGPSSecs
 
-
+    cpdef getEventNumber(self):
+         return self.c_evt_struct.eventNumber
 
     cpdef getHiLo(self):
          if (self.c_evt_struct.c_event == NULL):
