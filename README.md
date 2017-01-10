@@ -1,4 +1,4 @@
-# PyVBF
+# PyVBFIO
 VBF wrapper written in Cython
 
 # Requirement
