@@ -13,6 +13,7 @@ cdef struct Event:
     int     numChannels
     ubyte*  samplesPtr
     uword16*  GPSTime
+    VArrayTrigger* array_trigger
     ubyte   EventTypeCode
     TriggerType trigger 
     ubyte   GPSYear
@@ -99,6 +100,7 @@ cdef class PyVBFreader:
         if (self.c_evt_struct.c_event == NULL):
             return 
         else:
+            self.c_evt_struct.array_trigger = self.c_arrayevent.getTrigger()
             self.c_evt_struct.numSamples  = self.c_evt_struct.c_event.getNumSamples()
             self.c_evt_struct.numChannels = self.c_evt_struct.c_event.getNumChannels()
             self.c_evt_struct.samplesPtr = self.c_evt_struct.c_event.getSamplePtr(0,0)  
@@ -154,9 +156,16 @@ cdef class PyVBFreader:
          for i in range(numChannels):
              numpy_array[i] = self.c_evt_struct.c_event.getTriggerBit(i)
          return numpy_array           
+    
+    cpdef getTriggerTelescopeId(self):
+         if (self.c_evt_struct.c_event == NULL):
+            return np.zeros(4,dtype='uint32')
+         cdef ubyte numTelescopes = self.c_evt_struct.array_trigger.getNumTriggerTelescopes() 
+         numpy_array = np.zeros(numTelescopes,dtype='uint32')
+         for i in range(numTelescopes):
+             numpy_array[i] = self.c_evt_struct.array_trigger.getTriggerTelescopeId(i)
+         return numpy_array
 
-
-         
     cpdef getRawEventTypeCode(self):
          return self.c_evt_struct.EventTypeCode
 

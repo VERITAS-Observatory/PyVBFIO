@@ -51,6 +51,11 @@ cdef extern from "VDatum.h":
          bool    getHiLo(unsigned channel) except +
          bool    getTriggerBit(unsigned channel) except + 
 
+    cdef cppclass VArrayTrigger(VDatum):
+         ubyte getNumSubarrayTelescopes()
+         ubyte getNumTriggerTelescopes()
+         uword32 getTriggerTelescopeId(unsigned i) except +
+
 cdef extern from "VSimulationData.h":
     cdef cppclass VSimulationData:
          VSimulationData()
@@ -86,7 +91,7 @@ cdef extern from "VArrayEvent.h":
     cdef cppclass VArrayEvent:
          VArrayEvent()
          VEvent* getEventByNodeNumber(unsigned telnum)
-
+         VArrayTrigger* getTrigger() except + 
    
 
 cdef extern from "VPacket.h":
