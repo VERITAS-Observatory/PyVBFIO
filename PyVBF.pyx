@@ -144,6 +144,18 @@ cdef class PyVBFreader:
          for i in range(numChannels):
              numpy_array[i] = self.c_evt_struct.c_event.getHiLo(i)
          return numpy_array           
+
+    cpdef getTriggerPattern(self):
+         if (self.c_evt_struct.c_event == NULL):
+            return np.zeros(500,dtype='bool')
+
+         cdef int numChannels  = self.c_evt_struct.numChannels
+         numpy_array = np.zeros(numChannels,dtype='bool')
+         for i in range(numChannels):
+             numpy_array[i] = self.c_evt_struct.c_event.getTriggerBit(i)
+         return numpy_array           
+
+
          
     cpdef getRawEventTypeCode(self):
          return self.c_evt_struct.EventTypeCode

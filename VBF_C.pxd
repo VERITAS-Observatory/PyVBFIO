@@ -49,6 +49,7 @@ cdef extern from "VDatum.h":
          uword16 getMaxNumChannels()    
          ubyte*  getSamplePtr(unsigned channel,unsigned sample) except +
          bool    getHiLo(unsigned channel) except +
+         bool    getTriggerBit(unsigned channel) except + 
 
 cdef extern from "VSimulationData.h":
     cdef cppclass VSimulationData:
