@@ -98,7 +98,7 @@ cdef class PyVBFreader:
            raise Exception("No ArrayEvent Loaded")
         self.c_evt_struct.c_event = self.c_arrayevent.getEventByNodeNumber(i)  
         if (self.c_evt_struct.c_event == NULL):
-            return 
+           raise Exception("No Telescope Event Loaded")
         else:
             self.c_evt_struct.array_trigger = self.c_arrayevent.getTrigger()
             self.c_evt_struct.numSamples  = self.c_evt_struct.c_event.getNumSamples()
