@@ -176,6 +176,15 @@ cdef class PyVBFreader:
              numpy_array[i,j] = self.c_evt_struct.array_trigger.getL2CountsArray(i)[j]
          return numpy_array
 
+    cpdef getL2ScalarRate(self):
+         if (self.c_evt_struct.c_event == NULL):
+            return np.zeros(1,dtype='uint32')
+         cdef ubyte numSubarray = self.c_evt_struct.array_trigger.getNumSubarrayTelescopes() 
+         numpy_array = np.zeros(numSubarray,dtype='uint32')
+         for i in range(numSubarray):
+            numpy_array[i] = self.c_evt_struct.array_trigger.getL2ScalarRate(i)
+         return numpy_array
+
     cpdef getRawEventTypeCode(self):
          return self.c_evt_struct.EventTypeCode
 

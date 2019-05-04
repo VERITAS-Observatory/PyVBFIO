@@ -55,6 +55,7 @@ cdef extern from "VDatum.h":
          ubyte getNumSubarrayTelescopes()
          ubyte getNumTriggerTelescopes()
          bool  hasL2CountsArray()
+         uword32  getL2ScalarRate(unsigned i)  except +
          uword32* getL2CountsArray(unsigned i) except +
          uword32 getTriggerTelescopeId(unsigned i) except +
 
