@@ -54,6 +54,8 @@ cdef extern from "VDatum.h":
     cdef cppclass VArrayTrigger(VDatum):
          ubyte getNumSubarrayTelescopes()
          ubyte getNumTriggerTelescopes()
+         bool  hasL2CountsArray()
+         uword32* getL2CountsArray(unsigned i) except +
          uword32 getTriggerTelescopeId(unsigned i) except +
 
 cdef extern from "VSimulationData.h":

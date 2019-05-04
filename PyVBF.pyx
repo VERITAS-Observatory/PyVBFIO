@@ -166,6 +166,16 @@ cdef class PyVBFreader:
              numpy_array[i] = self.c_evt_struct.array_trigger.getTriggerTelescopeId(i)
          return numpy_array
 
+    cpdef getL2CountsRaw(self):
+         if (self.c_evt_struct.c_event == NULL):
+            return np.zeros(3,dtype='uint32')
+         cdef ubyte numSubarray = self.c_evt_struct.array_trigger.getNumSubarrayTelescopes() 
+         numpy_array = np.zeros((numSubarray,3),dtype='uint32')
+         for i in range(numSubarray):
+            for j in range(3):
+             numpy_array[i,j] = self.c_evt_struct.array_trigger.getL2CountsArray(i)[j]
+         return numpy_array
+
     cpdef getRawEventTypeCode(self):
          return self.c_evt_struct.EventTypeCode
 
